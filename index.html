@@ -1,0 +1,852 @@
+<html class="mdl-js">
+<head lang="en">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=1024">
+<meta name="keywords"
+	content="neural networks,machine learning,javascript">
+
+<meta property="og:type" content="article">
+<meta property="og:title"
+	content="Tensorflow — Neural Network Playground">
+<meta property="og:description"
+	content="Tinker with a real neural network right here in your browser.">
+<meta property="og:url" content="http://playground.tensorflow.org">
+<meta property="og:image"
+	content="http://playground.tensorflow.org/preview.png">
+
+<meta name="twitter:card" value="summary_large_image">
+<meta name="twitter:title"
+	content="Tensorflow — Neural Network Playground">
+<meta name="twitter:description"
+	content="Tinker with a real neural network right here in your browser.">
+<meta name="twitter:url" content="http://playground.tensorflow.org">
+<meta name="twitter:image"
+	content="http://playground.tensorflow.org/preview.png">
+<meta name="twitter:image:width" content="560">
+<meta name="twitter:image:height" content="295">
+
+<meta name="author" content="Daniel Smilkov and Shan Carter">
+<title>A Neural Network Playground</title>
+<link rel="stylesheet" href="bundle.css" type="text/css">
+<link
+	href="https://fonts.googleapis.com/css?family=Roboto:300,400,500|Material+Icons"
+	rel="stylesheet" type="text/css">
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script src="lib.js"></script>
+</head>
+<body>
+	<!-- GitHub link -->
+	<a class="github-link" href="https://github.com/tensorflow/playground"
+		title="Source on GitHub"> <svg xmlns="http://www.w3.org/2000/svg"
+			xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 60.5 60.5"
+			width="60" height="60">
+      <polygon class="bg" points="60.5,60.5 0,0 60.5,0 "></polygon>
+      <path class="icon"
+				d="M43.1,5.8c-6.6,0-12,5.4-12,12c0,5.3,3.4,9.8,8.2,11.4c0.6,0.1,0.8-0.3,0.8-0.6c0-0.3,0-1,0-2c-3.3,0.7-4-1.6-4-1.6c-0.5-1.4-1.3-1.8-1.3-1.8c-1.1-0.7,0.1-0.7,0.1-0.7c1.2,0.1,1.8,1.2,1.8,1.2c1.1,1.8,2.8,1.3,3.5,1c0.1-0.8,0.4-1.3,0.8-1.6c-2.7-0.3-5.5-1.3-5.5-5.9c0-1.3,0.5-2.4,1.2-3.2c-0.1-0.3-0.5-1.5,0.1-3.2c0,0,1-0.3,3.3,1.2c1-0.3,2-0.4,3-0.4c1,0,2,0.1,3,0.4c2.3-1.6,3.3-1.2,3.3-1.2c0.7,1.7,0.2,2.9,0.1,3.2c0.8,0.8,1.2,1.9,1.2,3.2c0,4.6-2.8,5.6-5.5,5.9c0.4,0.4,0.8,1.1,0.8,2.2c0,1.6,0,2.9,0,3.3c0,0.3,0.2,0.7,0.8,0.6c4.8-1.6,8.2-6.1,8.2-11.4C55.1,11.2,49.7,5.8,43.1,5.8z"></path>
+    </svg>
+	</a>
+	<!-- Header -->
+
+
+	<!-- Top Controls -->
+	<div id="top-controls">
+		<div class="container l--page">
+			<div class="timeline-controls">
+				<button
+					class="mdl-button mdl-js-button mdl-button--icon ui-resetButton"
+					id="reset-button" title="Reset the network"
+					data-upgraded=",MaterialButton">
+					<i class="material-icons">replay</i>
+				</button>
+				<button
+					class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored ui-playButton"
+					id="play-pause-button" title="Run/Pause"
+					data-upgraded=",MaterialButton">
+					<i class="material-icons">play_arrow</i> <i class="material-icons">pause</i>
+				</button>
+				<button
+					class="mdl-button mdl-js-button mdl-button--icon ui-stepButton"
+					id="next-step-button" title="Step" data-upgraded=",MaterialButton">
+					<i class="material-icons">skip_next</i>
+				</button>
+			</div>
+			<div class="control">
+				<span class="label">Epoch</span> <span class="value"
+					id="iter-number">000,000</span>
+			</div>
+			<div class="control ui-learningRate">
+				<label for="learningRate">Learning rate</label>
+				<div class="select">
+					<select id="learningRate">
+						<option value="0.00001">0.00001</option>
+						<option value="0.0001">0.0001</option>
+						<option value="0.001">0.001</option>
+						<option value="0.003">0.003</option>
+						<option value="0.01">0.01</option>
+						<option value="0.03">0.03</option>
+						<option value="0.1">0.1</option>
+						<option value="0.3">0.3</option>
+						<option value="1">1</option>
+						<option value="3">3</option>
+						<option value="10">10</option>
+					</select>
+				</div>
+			</div>
+			<div class="control ui-activation">
+				<label for="activations">Activation</label>
+				<div class="select">
+					<select id="activations">
+						<option value="relu">ReLU</option>
+						<option value="tanh">Tanh</option>
+						<option value="sigmoid">Sigmoid</option>
+						<option value="linear">Linear</option>
+					</select>
+				</div>
+			</div>
+			<div class="control ui-regularization">
+				<label for="regularizations">Regularization</label>
+				<div class="select">
+					<select id="regularizations">
+						<option value="none">None</option>
+						<option value="L1">L1</option>
+						<option value="L2">L2</option>
+					</select>
+				</div>
+			</div>
+			<div class="control ui-regularizationRate">
+				<label for="regularRate">Regularization rate</label>
+				<div class="select">
+					<select id="regularRate">
+						<option value="0">0</option>
+						<option value="0.001">0.001</option>
+						<option value="0.003">0.003</option>
+						<option value="0.01">0.01</option>
+						<option value="0.03">0.03</option>
+						<option value="0.1">0.1</option>
+						<option value="0.3">0.3</option>
+						<option value="1">1</option>
+						<option value="3">3</option>
+						<option value="10">10</option>
+					</select>
+				</div>
+			</div>
+			<div class="control ui-problem">
+				<label for="problem">Problem type</label>
+				<div class="select">
+					<select id="problem">
+						<option value="classification">Classification</option>
+						<option value="regression">Regression</option>
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Main Part -->
+	<div id="main-part" class="l--page">
+
+		<!--  Data Column-->
+		<div class="column data">
+			<h4>
+				<span>Data</span>
+			</h4>
+			<div class="ui-dataset">
+				<p>Which dataset do you want to use?</p>
+				<div class="dataset-list">
+					<div class="dataset" title="Circle" style="">
+						<canvas class="data-thumbnail" data-dataset="circle" width="100"
+							height="100"></canvas>
+					</div>
+					<div class="dataset" title="Exclusive or" style="">
+						<canvas class="data-thumbnail selected" data-dataset="xor"
+							width="100" height="100"></canvas>
+					</div>
+					<div class="dataset" title="Gaussian" style="">
+						<canvas class="data-thumbnail" data-dataset="gauss" width="100"
+							height="100"></canvas>
+					</div>
+					<div class="dataset" title="Spiral" style="">
+						<canvas class="data-thumbnail" data-dataset="spiral" width="100"
+							height="100"></canvas>
+					</div>
+					<div class="dataset" title="Plane" style="display: none;">
+						<canvas class="data-thumbnail selected"
+							data-regdataset="reg-plane" width="100" height="100"></canvas>
+					</div>
+					<div class="dataset" title="Multi gaussian" style="display: none;">
+						<canvas class="data-thumbnail" data-regdataset="reg-gauss"
+							width="100" height="100"></canvas>
+					</div>
+				</div>
+			</div>
+			<div>
+				<div class="ui-percTrainData">
+					<label for="percTrainData">Ratio of training to test
+						data:&nbsp;&nbsp;<span class="value">50</span>%
+					</label>
+					<p class="slider">
+					<div class="mdl-slider__container">
+						<input class="mdl-slider mdl-js-slider is-upgraded" type="range"
+							id="percTrainData" min="10" max="90" step="10"
+							data-upgraded=",MaterialSlider">
+						<div class="mdl-slider__background-flex">
+							<div class="mdl-slider__background-lower" style="flex: 0.5 1 0%;"></div>
+							<div class="mdl-slider__background-upper" style="flex: 0.5 1 0%;"></div>
+						</div>
+					</div>
+					</p>
+				</div>
+				<div class="ui-noise">
+					<label for="noise">Noise:&nbsp;&nbsp;<span class="value">0</span></label>
+					<p class="slider">
+					<div class="mdl-slider__container">
+						<input
+							class="mdl-slider mdl-js-slider is-upgraded is-lowest-value"
+							type="range" id="noise" min="0" max="50" step="5"
+							data-upgraded=",MaterialSlider">
+						<div class="mdl-slider__background-flex">
+							<div class="mdl-slider__background-lower" style="flex: 0 1 0%;"></div>
+							<div class="mdl-slider__background-upper" style="flex: 1 1 0%;"></div>
+						</div>
+					</div>
+					</p>
+				</div>
+				<div class="ui-batchSize">
+					<label for="batchSize">Batch size:&nbsp;&nbsp;<span
+						class="value">6</span></label>
+					<p class="slider">
+					<div class="mdl-slider__container">
+						<input class="mdl-slider mdl-js-slider is-upgraded" type="range"
+							id="batchSize" min="1" max="30" step="1"
+							data-upgraded=",MaterialSlider">
+						<div class="mdl-slider__background-flex">
+							<div class="mdl-slider__background-lower"
+								style="flex: 0.172414 1 0%;"></div>
+							<div class="mdl-slider__background-upper"
+								style="flex: 0.827586 1 0%;"></div>
+						</div>
+					</div>
+					</p>
+				</div>
+				<button class="basic-button" id="data-regen-button"
+					title="Regenerate data">Regenerate</button>
+			</div>
+		</div>
+
+		<!-- Features Column -->
+		<div class="column features" style="height: 495px;">
+			<h4>Features</h4>
+			<p>Which properties do you want to feed in?</p>
+			<div id="network">
+				<div id="canvas-6" class="canvas"
+					style="position: absolute; left: 432.294px; top: 58px;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-5" class="canvas"
+					style="position: absolute; left: 432.294px; top: 3px;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-4" class="canvas"
+					style="position: absolute; left: 201.706px; top: 168px;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-3" class="canvas"
+					style="position: absolute; left: 201.706px; top: 113px;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-2" class="canvas"
+					style="position: absolute; left: 201.706px; top: 58px;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-1" class="canvas"
+					style="position: absolute; left: 201.706px; top: 3px;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-sinY" class="canvas active"
+					style="position: absolute; left: 53px; top: 333px; cursor: pointer;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-sinX" class="canvas active"
+					style="position: absolute; left: 53px; top: 278px; cursor: pointer;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-xTimesY" class="canvas active"
+					style="position: absolute; left: 53px; top: 223px; cursor: pointer;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-ySquared" class="canvas active"
+					style="position: absolute; left: 53px; top: 168px; cursor: pointer;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-xSquared" class="canvas active"
+					style="position: absolute; left: 53px; top: 113px; cursor: pointer;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-y" class="canvas active"
+					style="position: absolute; left: 53px; top: 58px; cursor: pointer;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<div id="canvas-x" class="canvas active"
+					style="position: absolute; left: 53px; top: 3px; cursor: pointer;">
+					<div
+						style="width: 30px; height: 30px; position: relative; top: 0px; left: 0px;">
+						<canvas width="10" height="10"
+							style="width: 30px; height: 30px; position: absolute; top: 0px; left: 0px;"></canvas>
+					</div>
+				</div>
+				<svg id="svg" width="540" height="385">
+          <defs>
+            <marker id="markerArrow" markerWidth="7" markerHeight="13"
+						refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+              <path d="M2,11 L7,6 L2,2"></path>
+            </marker>
+          </defs>
+        <g class="core" transform="translate(3,3)">
+					<path marker-start="url(#markerArrow)" class="link" id="link6-7"
+						d="M461.2941176470588,70C500.6470588235294,70 500.6470588235294,18 540,18"
+						style="stroke-dashoffset: 0; stroke-width: 1.52144; stroke: rgb(236, 209, 177);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="link5-7"
+						d="M461.2941176470588,15C500.6470588235294,15 500.6470588235294,12 540,12"
+						style="stroke-dashoffset: 0; stroke-width: 1.27036; stroke: rgb(234, 221, 205);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="link4-6"
+						d="M230.70588235294116,180C330,180 330,74.5 429.2941176470588,74.5"
+						style="stroke-dashoffset: 0; stroke-width: 1.43401; stroke: rgb(235, 213, 187);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="link3-6"
+						d="M230.70588235294116,125C330,125 330,71.5 429.2941176470588,71.5"
+						style="stroke-dashoffset: 0; stroke-width: 1.07745; stroke: rgb(222, 229, 233);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="link2-6"
+						d="M230.70588235294116,70C330,70 330,68.5 429.2941176470588,68.5"
+						style="stroke-dashoffset: 0; stroke-width: 1.70945; stroke: rgb(144, 189, 217);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="link1-6"
+						d="M230.70588235294116,15C330,15 330,65.5 429.2941176470588,65.5"
+						style="stroke-dashoffset: 0; stroke-width: 1.75753; stroke: rgb(138, 186, 216);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="link4-5"
+						d="M230.70588235294116,180C330,180 330,19.5 429.2941176470588,19.5"
+						style="stroke-dashoffset: 0; stroke-width: 1.85503; stroke: rgb(238, 193, 140);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="link3-5"
+						d="M230.70588235294116,125C330,125 330,16.5 429.2941176470588,16.5"
+						style="stroke-dashoffset: 0; stroke-width: 1.4025; stroke: rgb(182, 208, 225);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="link2-5"
+						d="M230.70588235294116,70C330,70 330,13.5 429.2941176470588,13.5"
+						style="stroke-dashoffset: 0; stroke-width: 1.7286; stroke: rgb(237, 199, 154);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="link1-5"
+						d="M230.70588235294116,15C330,15 330,10.5 429.2941176470588,10.5"
+						style="stroke-dashoffset: 0; stroke-width: 1.20663; stroke: rgb(206, 221, 230);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linksinY-4"
+						d="M82,345C140.35294117647058,345 140.35294117647058,185.14285714285714 198.70588235294116,185.14285714285714"
+						style="stroke-dashoffset: 0; stroke-width: 1.32104; stroke: rgb(234, 218, 199);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linksinX-4"
+						d="M82,290C140.35294117647058,290 140.35294117647058,183.42857142857142 198.70588235294116,183.42857142857142"
+						style="stroke-dashoffset: 0; stroke-width: 1.44691; stroke: rgb(235, 212, 185);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkxTimesY-4"
+						d="M82,235C140.35294117647058,235 140.35294117647058,181.71428571428572 198.70588235294116,181.71428571428572"
+						style="stroke-dashoffset: 0; stroke-width: 1.12431; stroke: rgb(217, 226, 232);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkySquared-4"
+						d="M82,180C140.35294117647058,180 140.35294117647058,180 198.70588235294116,180"
+						style="stroke-dashoffset: 0; stroke-width: 1.82068; stroke: rgb(238, 194, 143);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkxSquared-4"
+						d="M82,125C140.35294117647058,125 140.35294117647058,178.28571428571428 198.70588235294116,178.28571428571428"
+						style="stroke-dashoffset: 0; stroke-width: 1.15854; stroke: rgb(212, 224, 231);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linky-4"
+						d="M82,70C140.35294117647058,70 140.35294117647058,176.57142857142858 198.70588235294116,176.57142857142858"
+						style="stroke-dashoffset: 0; stroke-width: 1.24807; stroke: rgb(201, 218, 229);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linkx-4"
+						d="M82,15C140.35294117647058,15 140.35294117647058,174.85714285714286 198.70588235294116,174.85714285714286"
+						style="stroke-dashoffset: 0; stroke-width: 1.45503; stroke: rgb(235, 212, 184);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linksinY-3"
+						d="M82,345C140.35294117647058,345 140.35294117647058,130.14285714285714 198.70588235294116,130.14285714285714"
+						style="stroke-dashoffset: 0; stroke-width: 1.09607; stroke: rgb(233, 229, 224);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linksinX-3"
+						d="M82,290C140.35294117647058,290 140.35294117647058,128.42857142857142 198.70588235294116,128.42857142857142"
+						style="stroke-dashoffset: 0; stroke-width: 1.19198; stroke: rgb(208, 222, 230);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkxTimesY-3"
+						d="M82,235C140.35294117647058,235 140.35294117647058,126.71428571428571 198.70588235294116,126.71428571428571"
+						style="stroke-dashoffset: 0; stroke-width: 1.82578; stroke: rgb(238, 194, 143);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkySquared-3"
+						d="M82,180C140.35294117647058,180 140.35294117647058,125 198.70588235294116,125"
+						style="stroke-dashoffset: 0; stroke-width: 1.29667; stroke: rgb(195, 215, 227);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkxSquared-3"
+						d="M82,125C140.35294117647058,125 140.35294117647058,123.28571428571429 198.70588235294116,123.28571428571429"
+						style="stroke-dashoffset: 0; stroke-width: 1.69418; stroke: rgb(237, 200, 157);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linky-3"
+						d="M82,70C140.35294117647058,70 140.35294117647058,121.57142857142857 198.70588235294116,121.57142857142857"
+						style="stroke-dashoffset: 0; stroke-width: 1.38144; stroke: rgb(235, 216, 192);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linkx-3"
+						d="M82,15C140.35294117647058,15 140.35294117647058,119.85714285714286 198.70588235294116,119.85714285714286"
+						style="stroke-dashoffset: 0; stroke-width: 1.43938; stroke: rgb(235, 213, 186);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linksinY-2"
+						d="M82,345C140.35294117647058,345 140.35294117647058,75.14285714285714 198.70588235294116,75.14285714285714"
+						style="stroke-dashoffset: 0; stroke-width: 1.57794; stroke: rgb(236, 206, 170);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linksinX-2"
+						d="M82,290C140.35294117647058,290 140.35294117647058,73.42857142857143 198.70588235294116,73.42857142857143"
+						style="stroke-dashoffset: 0; stroke-width: 1.53953; stroke: rgb(236, 208, 175);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkxTimesY-2"
+						d="M82,235C140.35294117647058,235 140.35294117647058,71.71428571428571 198.70588235294116,71.71428571428571"
+						style="stroke-dashoffset: 0; stroke-width: 1.50399; stroke: rgb(169, 202, 222);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkySquared-2"
+						d="M82,180C140.35294117647058,180 140.35294117647058,70 198.70588235294116,70"
+						style="stroke-dashoffset: 0; stroke-width: 1.22628; stroke: rgb(204, 220, 229);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkxSquared-2"
+						d="M82,125C140.35294117647058,125 140.35294117647058,68.28571428571429 198.70588235294116,68.28571428571429"
+						style="stroke-dashoffset: 0; stroke-width: 1.6003; stroke: rgb(157, 196, 220);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linky-2"
+						d="M82,70C140.35294117647058,70 140.35294117647058,66.57142857142857 198.70588235294116,66.57142857142857"
+						style="stroke-dashoffset: 0; stroke-width: 1.08591; stroke: rgb(221, 229, 233);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linkx-2"
+						d="M82,15C140.35294117647058,15 140.35294117647058,64.85714285714286 198.70588235294116,64.85714285714286"
+						style="stroke-dashoffset: 0; stroke-width: 1.79768; stroke: rgb(133, 183, 215);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linksinY-1"
+						d="M82,345C140.35294117647058,345 140.35294117647058,20.142857142857142 198.70588235294116,20.142857142857142"
+						style="stroke-dashoffset: 0; stroke-width: 1.31213; stroke: rgb(234, 219, 200);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linksinX-1"
+						d="M82,290C140.35294117647058,290 140.35294117647058,18.428571428571427 198.70588235294116,18.428571428571427"
+						style="stroke-dashoffset: 0; stroke-width: 1.67066; stroke: rgb(237, 202, 160);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkxTimesY-1"
+						d="M82,235C140.35294117647058,235 140.35294117647058,16.714285714285715 198.70588235294116,16.714285714285715"
+						style="stroke-dashoffset: 0; stroke-width: 1.11957; stroke: rgb(233, 228, 222);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkySquared-1"
+						d="M82,180C140.35294117647058,180 140.35294117647058,15 198.70588235294116,15"
+						style="stroke-dashoffset: 0; stroke-width: 1.60972; stroke: rgb(236, 205, 167);"></path>
+					<path marker-start="url(#markerArrow)" class="link"
+						id="linkxSquared-1"
+						d="M82,125C140.35294117647058,125 140.35294117647058,13.285714285714286 198.70588235294116,13.285714285714286"
+						style="stroke-dashoffset: 0; stroke-width: 1.29434; stroke: rgb(195, 215, 227);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linky-1"
+						d="M82,70C140.35294117647058,70 140.35294117647058,11.571428571428571 198.70588235294116,11.571428571428571"
+						style="stroke-dashoffset: 0; stroke-width: 1.06469; stroke: rgb(232, 231, 228);"></path>
+					<path marker-start="url(#markerArrow)" class="link" id="linkx-1"
+						d="M82,15C140.35294117647058,15 140.35294117647058,9.857142857142858 198.70588235294116,9.857142857142858"
+						style="stroke-dashoffset: 0; stroke-width: 1.87181; stroke: rgb(124, 178, 213);"></path>
+					<g class="node active" id="nodex" transform="translate(50,0)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<text class="main-label" x="-10" y="15" text-anchor="end">
+					<tspan>X</tspan>
+					<tspan baseline-shift="sub" style="font-size: 9px;">1</tspan></text></g>
+					<g class="node active" id="nodey" transform="translate(50,55)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<text class="main-label" x="-10" y="15" text-anchor="end">
+					<tspan>X</tspan>
+					<tspan baseline-shift="sub" style="font-size: 9px;">2</tspan></text></g>
+					<g class="node active" id="nodexSquared"
+						transform="translate(50,110)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<text class="main-label" x="-10" y="15" text-anchor="end">
+					<tspan>X</tspan>
+					<tspan baseline-shift="sub" style="font-size: 9px;">1</tspan>
+					<tspan baseline-shift="super" style="font-size: 9px;">2</tspan></text></g>
+					<g class="node active" id="nodeySquared"
+						transform="translate(50,165)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<text class="main-label" x="-10" y="15" text-anchor="end">
+					<tspan>X</tspan>
+					<tspan baseline-shift="sub" style="font-size: 9px;">2</tspan>
+					<tspan baseline-shift="super" style="font-size: 9px;">2</tspan></text></g>
+					<g class="node active" id="nodexTimesY"
+						transform="translate(50,220)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<text class="main-label" x="-10" y="15" text-anchor="end">
+					<tspan>X</tspan>
+					<tspan baseline-shift="sub" style="font-size: 9px;">1</tspan>
+					<tspan>X</tspan>
+					<tspan baseline-shift="sub" style="font-size: 9px;">2</tspan></text></g>
+					<g class="node active" id="nodesinX" transform="translate(50,275)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<text class="main-label" x="-10" y="15" text-anchor="end">
+					<tspan>sin(X</tspan>
+					<tspan baseline-shift="sub" style="font-size: 9px;">1</tspan>
+					<tspan>)</tspan></text></g>
+					<g class="node active" id="nodesinY" transform="translate(50,330)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<text class="main-label" x="-10" y="15" text-anchor="end">
+					<tspan>sin(X</tspan>
+					<tspan baseline-shift="sub" style="font-size: 9px;">2</tspan>
+					<tspan>)</tspan></text></g>
+					<g class="node" id="node1"
+						transform="translate(198.70588235294116,0)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<rect id="bias-1" x="-7" y="28" width="5" height="5"
+						style="fill: rgb(210, 223, 230);"></rect></g>
+					<path
+						d="M82,15C140.35294117647058,15 140.35294117647058,9.857142857142858 198.70588235294116,9.857142857142858"
+						class="link-hover"></path>
+					<path
+						d="M82,70C140.35294117647058,70 140.35294117647058,11.571428571428571 198.70588235294116,11.571428571428571"
+						class="link-hover"></path>
+					<path
+						d="M82,125C140.35294117647058,125 140.35294117647058,13.285714285714286 198.70588235294116,13.285714285714286"
+						class="link-hover"></path>
+					<path
+						d="M82,180C140.35294117647058,180 140.35294117647058,15 198.70588235294116,15"
+						class="link-hover"></path>
+					<path
+						d="M82,235C140.35294117647058,235 140.35294117647058,16.714285714285715 198.70588235294116,16.714285714285715"
+						class="link-hover"></path>
+					<path
+						d="M82,290C140.35294117647058,290 140.35294117647058,18.428571428571427 198.70588235294116,18.428571428571427"
+						class="link-hover"></path>
+					<path
+						d="M82,345C140.35294117647058,345 140.35294117647058,20.142857142857142 198.70588235294116,20.142857142857142"
+						class="link-hover"></path>
+					<g class="node" id="node2"
+						transform="translate(198.70588235294116,55)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<rect id="bias-2" x="-7" y="28" width="5" height="5"
+						style="fill: rgb(210, 223, 230);"></rect></g>
+					<path
+						d="M82,15C140.35294117647058,15 140.35294117647058,64.85714285714286 198.70588235294116,64.85714285714286"
+						class="link-hover"></path>
+					<path
+						d="M82,70C140.35294117647058,70 140.35294117647058,66.57142857142857 198.70588235294116,66.57142857142857"
+						class="link-hover"></path>
+					<path
+						d="M82,125C140.35294117647058,125 140.35294117647058,68.28571428571429 198.70588235294116,68.28571428571429"
+						class="link-hover"></path>
+					<path
+						d="M82,180C140.35294117647058,180 140.35294117647058,70 198.70588235294116,70"
+						class="link-hover"></path>
+					<path
+						d="M82,235C140.35294117647058,235 140.35294117647058,71.71428571428571 198.70588235294116,71.71428571428571"
+						class="link-hover"></path>
+					<path
+						d="M82,290C140.35294117647058,290 140.35294117647058,73.42857142857143 198.70588235294116,73.42857142857143"
+						class="link-hover"></path>
+					<path
+						d="M82,345C140.35294117647058,345 140.35294117647058,75.14285714285714 198.70588235294116,75.14285714285714"
+						class="link-hover"></path>
+					<g class="node" id="node3"
+						transform="translate(198.70588235294116,110)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<rect id="bias-3" x="-7" y="28" width="5" height="5"
+						style="fill: rgb(210, 223, 230);"></rect></g>
+					<path
+						d="M82,15C140.35294117647058,15 140.35294117647058,119.85714285714286 198.70588235294116,119.85714285714286"
+						class="link-hover"></path>
+					<path
+						d="M82,70C140.35294117647058,70 140.35294117647058,121.57142857142857 198.70588235294116,121.57142857142857"
+						class="link-hover"></path>
+					<path
+						d="M82,125C140.35294117647058,125 140.35294117647058,123.28571428571429 198.70588235294116,123.28571428571429"
+						class="link-hover"></path>
+					<path
+						d="M82,180C140.35294117647058,180 140.35294117647058,125 198.70588235294116,125"
+						class="link-hover"></path>
+					<path
+						d="M82,235C140.35294117647058,235 140.35294117647058,126.71428571428571 198.70588235294116,126.71428571428571"
+						class="link-hover"></path>
+					<path
+						d="M82,290C140.35294117647058,290 140.35294117647058,128.42857142857142 198.70588235294116,128.42857142857142"
+						class="link-hover"></path>
+					<path
+						d="M82,345C140.35294117647058,345 140.35294117647058,130.14285714285714 198.70588235294116,130.14285714285714"
+						class="link-hover"></path>
+					<g class="node" id="node4"
+						transform="translate(198.70588235294116,165)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<rect id="bias-4" x="-7" y="28" width="5" height="5"
+						style="fill: rgb(210, 223, 230);"></rect></g>
+					<path
+						d="M82,15C140.35294117647058,15 140.35294117647058,174.85714285714286 198.70588235294116,174.85714285714286"
+						class="link-hover"></path>
+					<path
+						d="M82,70C140.35294117647058,70 140.35294117647058,176.57142857142858 198.70588235294116,176.57142857142858"
+						class="link-hover"></path>
+					<path
+						d="M82,125C140.35294117647058,125 140.35294117647058,178.28571428571428 198.70588235294116,178.28571428571428"
+						class="link-hover"></path>
+					<path
+						d="M82,180C140.35294117647058,180 140.35294117647058,180 198.70588235294116,180"
+						class="link-hover"></path>
+					<path
+						d="M82,235C140.35294117647058,235 140.35294117647058,181.71428571428572 198.70588235294116,181.71428571428572"
+						class="link-hover"></path>
+					<path
+						d="M82,290C140.35294117647058,290 140.35294117647058,183.42857142857142 198.70588235294116,183.42857142857142"
+						class="link-hover"></path>
+					<path
+						d="M82,345C140.35294117647058,345 140.35294117647058,185.14285714285714 198.70588235294116,185.14285714285714"
+						class="link-hover"></path>
+					<g class="node" id="node5"
+						transform="translate(429.2941176470588,0)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<rect id="bias-5" x="-7" y="28" width="5" height="5"
+						style="fill: rgb(210, 223, 230);"></rect></g>
+					<path
+						d="M230.70588235294116,15C330,15 330,10.5 429.2941176470588,10.5"
+						class="link-hover"></path>
+					<path
+						d="M230.70588235294116,70C330,70 330,13.5 429.2941176470588,13.5"
+						class="link-hover"></path>
+					<path
+						d="M230.70588235294116,125C330,125 330,16.5 429.2941176470588,16.5"
+						class="link-hover"></path>
+					<path
+						d="M230.70588235294116,180C330,180 330,19.5 429.2941176470588,19.5"
+						class="link-hover"></path>
+					<g class="node" id="node6"
+						transform="translate(429.2941176470588,55)">
+					<rect x="0" y="0" width="30" height="30"></rect>
+					<rect id="bias-6" x="-7" y="28" width="5" height="5"
+						style="fill: rgb(210, 223, 230);"></rect></g>
+					<path
+						d="M230.70588235294116,15C330,15 330,65.5 429.2941176470588,65.5"
+						class="link-hover"></path>
+					<path
+						d="M230.70588235294116,70C330,70 330,68.5 429.2941176470588,68.5"
+						class="link-hover"></path>
+					<path
+						d="M230.70588235294116,125C330,125 330,71.5 429.2941176470588,71.5"
+						class="link-hover"></path>
+					<path
+						d="M230.70588235294116,180C330,180 330,74.5 429.2941176470588,74.5"
+						class="link-hover"></path>
+					<path
+						d="M461.2941176470588,15C500.6470588235294,15 500.6470588235294,12 540,12"
+						class="link-hover"></path>
+					<path
+						d="M461.2941176470588,70C500.6470588235294,70 500.6470588235294,18 540,18"
+						class="link-hover"></path></g></svg>
+				<!-- Hover card -->
+				<div id="hovercard"
+					style="left: 552.906px; top: 18px; display: none;">
+					<div style="font-size: 10px">Click anywhere to edit.</div>
+					<div>
+						<span class="type">Weight</span> is <span class="value">-0.29</span><span><input
+							type="number" style="display: none;"></span>.
+					</div>
+				</div>
+				<div class="callout thumbnail" style="top: 203px; left: 213.706px;">
+					<svg viewBox="0 0 30 30">
+            <defs>
+              <marker id="arrow" markerWidth="5" markerHeight="5"
+							refX="5" refY="2.5" orient="auto" markerUnits="userSpaceOnUse">
+                <path d="M0,0 L5,2.5 L0,5 z"></path>
+              </marker>
+            </defs>
+            <path d="M12,30C5,20 2,15 12,0" marker-end="url(#arrow)">
+          </path></svg>
+					<div class="label">
+						This is the output from one <b>neuron</b>. Hover to see it larger.
+					</div>
+				</div>
+				<div class="callout weights" style="top: 100.39px; left: 366.905px;">
+					<svg viewBox="0 0 30 30">
+            <defs>
+              <marker id="arrow" markerWidth="5" markerHeight="5"
+							refX="5" refY="2.5" orient="auto" markerUnits="userSpaceOnUse">
+                <path d="M0,0 L5,2.5 L0,5 z"></path>
+              </marker>
+            </defs>
+            <path d="M12,30C5,20 2,15 12,0" marker-end="url(#arrow)">
+          </path></svg>
+					<div class="label">
+						The outputs are mixed with varying <b>weights</b>, shown by the
+						thickness of the lines.
+					</div>
+				</div>
+				<div class="plus-minus-neurons" style="left: 188.706px;">
+					<div class="ui-numNodes1">
+						<button class="mdl-button mdl-js-button mdl-button--icon">
+							<i class="material-icons">add</i>
+						</button>
+						<button class="mdl-button mdl-js-button mdl-button--icon">
+							<i class="material-icons">remove</i>
+						</button>
+					</div>
+					<div>4 neurons</div>
+				</div>
+				<div class="plus-minus-neurons" style="left: 419.294px;">
+					<div class="ui-numNodes2">
+						<button class="mdl-button mdl-js-button mdl-button--icon">
+							<i class="material-icons">add</i>
+						</button>
+						<button class="mdl-button mdl-js-button mdl-button--icon">
+							<i class="material-icons">remove</i>
+						</button>
+					</div>
+					<div>2 neurons</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Hidden Layers Column -->
+		<div class="column hidden-layers">
+			<h4>
+				<div class="ui-numHiddenLayers">
+					<button id="add-layers"
+						class="mdl-button mdl-js-button mdl-button--icon"
+						data-upgraded=",MaterialButton">
+						<i class="material-icons">add</i>
+					</button>
+					<button id="remove-layers"
+						class="mdl-button mdl-js-button mdl-button--icon"
+						data-upgraded=",MaterialButton">
+						<i class="material-icons">remove</i>
+					</button>
+				</div>
+				<span id="num-layers">2</span> <span id="layers-label">Hidden
+					layers</span>
+			</h4>
+			<div class="bracket"></div>
+		</div>
+
+		<!-- Output Column -->
+		<div class="column output">
+			<h4>Output</h4>
+			<div class="metrics">
+				<div class="output-stats ui-percTrainData">
+					<span>Test cost</span>
+					<div class="value" id="loss-test">0.749</div>
+				</div>
+				<div class="output-stats train">
+					<span>Training cost</span>
+					<div class="value" id="loss-train">0.727</div>
+				</div>
+				<div id="linechart" style='display:none'>
+				</div>
+			</div>
+			<div id="heatmap"></div>
+				
+			<div style="float: left; margin-top: 20px">
+				<div style="display: flex; align-items: center;">
+
+					<!-- Gradient color scale -->
+					<div class="label" style="width: 105px; margin-right: 10px">
+						Colors shows data, neuron and weight values.</div>
+					<svg width="150" height="30" id="colormap">
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="100%" x2="100%"
+							y2="100%">
+                <stop offset="0%" stop-color="#f59322" stop-opacity="1"></stop>
+                <stop offset="50%" stop-color="#e8eaeb" stop-opacity="1"></stop>
+                <stop offset="100%" stop-color="#0877bd"
+							stop-opacity="1"></stop>
+              </linearGradient>
+            </defs>
+            <g class="core" transform="translate(3, 0)">
+              <rect width="144" height="10"
+							style="fill: url('#gradient');"></rect>
+            <g class="x axis" transform="translate(0,10)">
+						<g class="tick" transform="translate(0,0)" style="opacity: 1;">
+						<line y2="6" x2="0"></line>
+						<text dy=".71em" y="9" x="0" style="text-anchor: middle;">-1</text></g>
+						<g class="tick" transform="translate(72,0)" style="opacity: 1;">
+						<line y2="6" x2="0"></line>
+						<text dy=".71em" y="9" x="0" style="text-anchor: middle;">0</text></g>
+						<g class="tick" transform="translate(144,0)" style="opacity: 1;">
+						<line y2="6" x2="0"></line>
+						<text dy=".71em" y="9" x="0" style="text-anchor: middle;">1</text></g>
+						<path class="domain" d="M0,6V0H144V6"></path></g></g>
+          </svg>
+				</div>
+				<br>
+				<div style="display: flex;">
+					<label
+						class="ui-showTestData mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect mdl-js-ripple-effect--ignore-events is-upgraded"
+						for="show-test-data"
+						data-upgraded=",MaterialCheckbox,MaterialRipple"> <input
+						type="checkbox" id="show-test-data" class="mdl-checkbox__input"
+						checked=""> <span class="mdl-checkbox__label label">Show
+							test data</span> <span class="mdl-checkbox__focus-helper"></span><span
+						class="mdl-checkbox__box-outline"><span
+							class="mdl-checkbox__tick-outline"></span></span><span
+						class="mdl-checkbox__ripple-container mdl-js-ripple-effect mdl-ripple--center"
+						data-upgraded=",MaterialRipple"><span
+							class="mdl-ripple is-animating"
+							style="width: 103.823px; height: 103.823px; transform: translate(-50%, -50%) translate(18px, 18px);"></span></span></label>
+					<label
+						class="ui-discretize mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect mdl-js-ripple-effect--ignore-events is-upgraded"
+						for="discretize" data-upgraded=",MaterialCheckbox,MaterialRipple">
+						<input type="checkbox" id="discretize" class="mdl-checkbox__input"
+						checked=""> <span class="mdl-checkbox__label label">Discretize
+							output</span> <span class="mdl-checkbox__focus-helper"></span><span
+						class="mdl-checkbox__box-outline"><span
+							class="mdl-checkbox__tick-outline"></span></span><span
+						class="mdl-checkbox__ripple-container mdl-js-ripple-effect mdl-ripple--center"
+						data-upgraded=",MaterialRipple"><span
+							class="mdl-ripple is-animating"
+							style="width: 103.823px; height: 103.823px; transform: translate(-50%, -50%) translate(18px, 18px);"></span></span>
+					</label>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<!-- More -->
+	<div class="more">
+		<!-- <button class="mdl-button mdl-js-button mdl-button--icon"><i class="material-icons">keyboard_arrow_down</i></button> -->
+
+	</div>
+	<!-- Article -->
+
+
+
+	<!-- Footer -->
+
+	<script src="bundle.js"></script>
+	<!-- Google analytics -->
+	<script src="analytics.js"></script>
+
+
+</body>
+</html>
